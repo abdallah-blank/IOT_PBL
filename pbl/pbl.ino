@@ -34,8 +34,8 @@ void setup() {
   SPI.begin(); //initialize SPI bus
   oledDebut();
   rfid.PCD_Init(); //initialize MFRC522 card
-  pinMode(buttonPin, INPUT);
   pinMode(buzzerPin, OUTPUT);
+  lockedDoor();
   
 }
 
@@ -53,28 +53,9 @@ void loop() {
   rfid.PICC_HaltA(); // Halt PICC
   
   //End of RFID CARD READING
-
-  //Button inputs
   bool isUnlocked = keyChecker(tag);
-  Serial.println(digitalRead(buttonPin));
- 
 
 
-
-
-
-
-
-
-
-  // OLED PART
-
-
-  
-
-
-  bool isAlarmed = alarm();
-//Buttons
 
 
 
@@ -87,9 +68,10 @@ void loop() {
 
 
   if(isUnlocked){
+    oledscr.setCursor(0,0);
     oledDisplay(3, WHITE, "Door");
     oledscr.setCursor(0, 25);
-    oledDisplay(3,WHITE,"Opened");
+    oledDisplay(3,WHITE,"Open");
     oledscr.display();
     delay(300);
     for (int i = 5; i > 0; i--) {
@@ -103,58 +85,46 @@ void loop() {
     wrongAttempts=3;
     digitalWrite(buzzerPin, LOW);
       
-    isAlarmed = false;
   }
-  if(!isUnlocked){
+    if(!keyChecker(tag)){
+    wrongAttempts--;
+    Serial.print("You have ");
+    Serial.print(wrongAttempts);
+    Serial.println(" attempts left");
+    oledscr.clearDisplay();
+    if(wrongAttempts == 0){
+
+      Serial.println("No attempts Left");
+      delay(200);
+      oledDisplay(2, WHITE, "INTRUDER");
+      oledscr.setCursor(0, 25);
+      oledDisplay(2,WHITE,"ALERT!!!");
+      oledscr.display();
+      delay(200);
+      digitalWrite(buzzerPin, 1);
+
+
+    }
+  }
+  else{
+    lockedDoor();
+  }
+ 
+
+}
+
+
+
+
+void lockedDoor(){
+    oledscr.setCursor(0,0);
     oledDisplay(3, WHITE ,"Door");
     oledscr.setCursor(0, 25);
     oledDisplay(3,WHITE,"Locked");
     oledscr.display();
     oledscr.clearDisplay();
     oledscr.setCursor(0, 0);
-  }
-  
-
-
-  
-
 }
-
-bool alarm(){
-  String tag = getHexString(rfid.uid.uidByte, rfid.uid.size);
-  oledscr.clearDisplay();
-  if(!keyChecker(tag)){
-    wrongAttempts--;
- 
-    if(wrongAttempts == 0){
-      oledscr.clearDisplay();
-      Serial.println("No attempts Left");
-      delay(200);
-      oledDisplay(3, WHITE, "INTRUDER");
-      oledscr.setCursor(0, 25);
-      oledDisplay(3,WHITE,"ALERT!!!");
-      oledscr.display();
-      delay(200);
-      digitalWrite(buzzerPin, 1);
-
-
-      return true;
-    }
-    else{
-    Serial.print("You have ");
-    Serial.print(wrongAttempts);
-    Serial.println(" attempts left");
-    return false;
-    }
-}
-}
-
-
-
-
-
-
-
 
 
 
@@ -193,11 +163,12 @@ String getHexString(byte *buffer, byte bufferSize) {
 //Check if the correct key is used
 bool keyChecker(String tagged){
   if(tagged == "6C7D3A5C"){
-    Serial.println("WOW");
     digitalWrite(buzzerPin, 0);
+    oledscr.clearDisplay();
     return true;
   }
   else{
+    oledscr.clearDisplay();
     return false;
   }
 }

@@ -16,7 +16,6 @@ Adafruit_SSD1306 oledscr = Adafruit_SSD1306(128, 64, &Wire);
 
 //Set Variables
 long buzzerPin = 4;
-long buttonPin = 5;
 #define RST_PIN 49
 #define SS_PIN 53
 

@@ -20,9 +20,9 @@ long buttonPin = 5;
 #define RST_PIN 49
 #define SS_PIN 53
 
-int buttonAttempts = 3;
+
 int wrongAttempts = 3;
-int buttonPush = 0;
+
 
 
 //create MFRC522 instance.
@@ -201,13 +201,6 @@ bool keyChecker(String tagged){
   else{
     return false;
   }
-}
-
-
-
-/*//////////////////////I WAS HERE*/
-void attempts(){
-
 }
 
 

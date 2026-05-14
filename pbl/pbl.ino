@@ -94,7 +94,7 @@ void loop() {
     oledscr.setCursor(0, 25);
     oledDisplay(2,WHITE,"ALERT!!!");
     oledscr.display();
-    delay(200);
+    delay(100);
     digitalWrite(buzzerPin, 1);
    }
   }
@@ -155,7 +155,6 @@ String getHexString(byte *buffer, byte bufferSize) {
 //Check if the correct key is used
 bool keyChecker(String tagged){
   if(tagged == "6C7D3A5C"){
-    digitalWrite(buzzerPin, 0);
     oledscr.clearDisplay();
     return true;
   }
